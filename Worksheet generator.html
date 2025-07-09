@@ -1,0 +1,672 @@
+import React, { useState } from 'react';
+
+// Define topics for each grade and subject
+const gradeTopics = {
+    'Kindergarten': {
+        'English': ['Alphabet Recognition', 'Letter Sounds', 'Basic Sight Words', 'Simple Story Comprehension', 'Rhyming Words'],
+        'Math': ['Counting to 20', 'Number Recognition (0-10)', 'Basic Shapes', 'Comparing Quantities', 'Simple Patterns'],
+        'Science': ['Parts of a Plant', 'Animal Sounds', 'Seasons', 'Weather Basics', 'My Five Senses'],
+        'Early Finance': [
+            'Recognizing Coins', 'Saving in a Piggy Bank', 'Wants vs. Needs', 'Sharing Money',
+            'Things that cost money (expenses)', 'Things that can make money (simple earning)'
+        ]
+    },
+    'Grade 1': {
+        'English': ['Phonics (CVC words)', 'Sentence Writing', 'Reading Simple Sentences', 'Capitalization and Punctuation', 'Story Elements'],
+        'Math': ['Addition and Subtraction (within 20)', 'Place Value (tens and ones)', 'Counting to 100', '2D and 3D Shapes', 'Non-Standard Measurement'],
+        'Science': ['Animal Classification', 'Plant Needs', 'Day and Night Sky', 'States of Water', 'Push and Pull'],
+        'Early Finance': [
+            'Counting Money (Coins & Bills)', 'Concept of Earning (Allowance, Chores)', 'Simple Spending vs. Saving', 'Donating Money',
+            'Understanding things you own (simple assets)', 'Understanding things you pay for (simple liabilities)'
+        ]
+    },
+    'Grade 2': {
+        'English': [
+            'Nouns and Verbs', 'Sentence Structure', 'Story Writing', 'Reading Comprehension', 'Sight Words', 'Punctuation'
+        ],
+        'Math': [
+            'Addition and Subtraction (up to 100)', 'Place Value', 'Basic Fractions', 'Measurement (length)', 'Time (to the nearest 5 minutes)', 'Counting Money'
+        ],
+        'Science': [
+            'Plant Life Cycles', 'Animal Habitats', 'Weather', 'States of Matter (solids, liquids, gases)', 'Human Body Basics',
+            'Energy Sources', 'Nervous System', 'Respiratory System', 'Digestive System', 'Heart', 'Liver', 'Stomach', 'Lungs'
+        ],
+        'Early Finance': [
+            'Understanding Income (Allowance, Gifts)', 'Basic Spending & Saving Decisions', 'What is a Bank Account?',
+            'Asset vs. Liability (simple examples like toys that earn vs. toys that need batteries)', 'Starting a Small Business Idea'
+        ]
+    },
+    'Grade 3': {
+        'English': ['Paragraph Structure', 'Figurative Language (similes, metaphors)', 'Reading Fluency', 'Prefixes and Suffixes', 'Opinion Writing'],
+        'Math': ['Multiplication and Division (basic facts)', 'Fractions (unit fractions)', 'Area and Perimeter', 'Bar Graphs', 'Money Word Problems'],
+        'Science': ['Food Chains', 'Rock Cycle', 'Magnets', 'Sound Energy', 'Adaptations'],
+        'Early Finance': [
+            'Earning Money (Chores, Simple Jobs)', 'Basic Budgeting (Income & Expenses)', 'Understanding Debt (Borrowing & Lending)',
+            'Assets (things that put money in your pocket)', 'Liabilities (things that take money out of your pocket)', 'The Value of Saving Early'
+        ]
+    },
+    'Grade 4': {
+        'English': ['Essays (intro, body, conclusion)', 'Poetry Analysis', 'Research Skills (basic)', 'Complex Sentences', 'Vocabulary Development'],
+        'Math': ['Multi-Digit Multiplication', 'Long Division', 'Equivalent Fractions', 'Angles and Lines', 'Decimals (tenths, hundredths)'],
+        'Science': ['Erosion and Weathering', 'Electricity', 'Light Energy', 'Water Cycle', 'Vertebrates and Invertebrates'],
+        'Early Finance': [
+            'Setting Saving Goals & Tracking Progress', 'Understanding Simple Interest (on savings)', 'Charitable Giving',
+            'Basic Entrepreneurship (e.g., selling crafts)', 'Asset vs. Liability (more examples)', 'Introduction to Passive Income (very simple)'
+        ]
+    },
+    'Grade 5': {
+        'English': [
+            'Paragraph Writing', 'Figurative Language', 'Main Idea and Supporting Details', 'Research Skills', 'Literary Elements', 'Grammar and Usage'
+        ],
+        'Math': [
+            'Multiplication and Division (multi-digit)', 'Fractions and Decimals', 'Geometry (area, perimeter, volume)', 'Data Analysis (graphs)', 'Order of Operations', 'Algebraic Thinking'
+        ],
+        'Science': [
+            // Life Science (Biology)
+            'Plants and Their Parts: Parts of a plant and their functions',
+            'Plants and Their Parts: Types of roots and leaves',
+            'Plants and Their Parts: Photosynthesis',
+            'Plants and Their Parts: Seed dispersal',
+            'Animals and Their Habitats: Types of animals (wild, domestic, aquatic, etc.)',
+            'Animals and Their Habitats: Adaptations in animals',
+            'Animals and Their Habitats: Food chain and food web',
+            'Human Body and Health: Major systems (digestive, respiratory, skeletal, circulatory)',
+            'Human Body and Health: Good habits and hygiene',
+            'Human Body and Health: Balanced diet',
+            'Human Body and Health: Diseases and prevention',
+            // Earth and Environment (Environmental Science)
+            'Natural Resources: Water (sources, conservation)',
+            'Natural Resources: Soil (types, uses)',
+            'Natural Resources: Air and its importance',
+            'Weather and Climate: Seasons and their effects',
+            'Weather and Climate: Weather forecasting tools',
+            'Pollution and Conservation: Types of pollution (air, water, soil)',
+            'Pollution and Conservation: Recycling and waste management',
+            'Pollution and Conservation: Sustainable living',
+            // Physical Science (Physics)
+            'Force and Motion: Types of forces (push, pull, friction)',
+            'Force and Motion: Simple machines (lever, pulley, inclined plane)',
+            'Light and Shadow: Sources of light',
+            'Light and Shadow: Reflection, transparency, shadow formation',
+            'Sound: How sound is produced',
+            'Sound: Loud and soft sounds',
+            'Sound: Vibrations',
+            // Materials and Chemistry
+            'States of Matter: Solid, liquid, gas',
+            'States of Matter: Changes in states (melting, freezing, evaporation)',
+            'Properties of Materials: Hardness, solubility, float/sink',
+            'Properties of Materials: Natural and man-made materials',
+            'Mixing and Separation: Types of mixtures',
+            'Mixing and Separation: Methods of separation (filtration, evaporation, etc.)',
+            // Energy and Electricity
+            'Sources of Energy: Renewable and non-renewable sources',
+            'Sources of Energy: Uses of solar, wind, hydro energy',
+            'Electricity and Circuits: Basic components (bulb, wire, battery)',
+            'Electricity and Circuits: Conductors and insulators'
+        ],
+        'Early Finance': [
+            'Budgeting for Events', 'Understanding Basic Taxes', 'Different Ways to Save', 'Responsible Spending Habits',
+            'Asset vs. Liability Differentiation (personal examples)', 'Earned Income vs. Passive Income (basic)', 'Introduction to Financial Freedom'
+        ]
+    },
+    'Grade 6': {
+        'English': ['Literary Analysis', 'Argumentative Writing', 'Figurative Language (advanced)', 'Greek and Latin Roots', 'Research Paper Basics'],
+        'Math': ['Ratios and Proportions', 'Integers', 'Expressions and Equations', 'Area of Polygons', 'Statistical Variability'],
+        'Science': ['Cells', 'Genetics (basic)', 'Plate Tectonics', 'Chemical Reactions (basic)', 'Space Exploration'],
+        'Early Finance': [
+            'Personal Budgeting & Tracking', 'Understanding Basic Credit (Good vs. Bad Debt)', 'Introduction to Investing (Stocks, Bonds - simplified)',
+            'Setting Financial Goals (Short-term vs. Long-term)', 'Building an Asset Column', 'Understanding the Income Statement (simplified)'
+        ]
+    },
+    'Grade 7': {
+        'English': ['Narrative Writing', 'Informational Text Analysis', 'Persuasive Techniques', 'Sentence Structure Variety', 'Vocabulary in Context'],
+        'Math': ['Rational Numbers', 'Proportional Relationships', 'Probability', 'Circles (circumference, area)', 'Solving Multi-Step Equations'],
+        'Science': ['Human Body Systems (detailed)', 'Ecology (biomes)', 'Mixtures and Solutions', 'Energy Transfer', 'Weather and Climate'],
+        'Early Finance': [
+            'Managing a Bank Account (Checking, Savings)', 'Understanding Debt (Student Loans, Mortgages - basic)', 'Types of Investments (Real Estate, Mutual Funds)',
+            'Basic Financial Planning', 'Cash Flow Quadrant (simplified)', 'The Importance of Financial Education'
+        ]
+    },
+    'Grade 8': {
+        'English': ['Expository Writing', 'Literary Devices', 'Argumentation and Debate', 'Research Project Development', 'Synthesizing Information'],
+        'Math': ['Linear Equations', 'Functions', 'Pythagorean Theorem', 'Transformations', 'Volume of Cylinders, Cones, Spheres'],
+        'Science': ['Atomic Structure', 'Periodic Table', 'Newton\'s Laws', 'Genetics and Heredity', 'Astronomy (stars, galaxies)'],
+        'Early Finance': [
+            'Career and Income (Different Income Streams)', 'Understanding Paychecks (Gross vs. Net Pay)', 'Introduction to Credit Scores',
+            'Risk and Return in Investments', 'Asset and Liability Differentiation (detailed examples)', 'Building a Personal Balance Sheet',
+            'Entrepreneurial Mindset'
+        ]
+    },
+    'Grade 9': {
+        'English': ['Literary Periods', 'Analytical Essays', 'Rhetorical Devices', 'Literary Criticism', 'Research and Citation'],
+        'Math': ['Algebra I (linear, quadratic equations)', 'Graphing Functions', 'Systems of Equations', 'Polynomials', 'Factoring'],
+        'Science': ['Biology (cells, DNA, evolution)', 'Chemistry (bonding, reactions)', 'Physics (kinematics, forces)', 'Earth Systems', 'Environmental Science'],
+        'Early Finance': [
+            'High School Budgeting & Financial Tracking', 'College Savings Options (529 plans)', 'Understanding Loans (Student, Car, Personal)',
+            'Compound Interest and its Power', 'Introduction to Financial Markets (Stocks, Bonds, ETFs)', 'Investing for Passive Income',
+            'The Difference Between a Job and a Business'
+        ]
+    },
+    'Grade 10': {
+        'English': ['World Literature', 'Literary Movements', 'Expository and Argumentative Modes', 'Critical Reading', 'Advanced Grammar'],
+        'Math': ['Geometry (proofs, theorems)', 'Trigonometry (basic)', 'Algebra II (rational, radical expressions)', 'Sequences and Series'],
+        'Science': ['Advanced Biology', 'Organic Chemistry Basics', 'Thermodynamics', 'Waves (sound, light)', 'Geology'],
+        'Early Finance': [
+            'Consumer Math & Smart Spending', 'Understanding Insurance (Health, Auto, Home)', 'Retirement Planning Basics (401k, IRA)',
+            'Global Economy Basics', 'Advanced Asset and Liability Analysis', 'Debt Management Strategies', 'Financial Literacy for Life'
+        ]
+    },
+    'Grade 11': {
+        'English': ['American Literature', 'Research Paper (advanced)', 'Literary Theory', 'Vocabulary for College Prep', 'Public Speaking'],
+        'Math': ['Pre-Calculus (functions, graphs, trigonometry)', 'Statistics (probability, distributions)', 'Matrices'],
+        'Science': ['Physics (mechanics, electricity)', 'Chemistry (stoichiometry, acids/bases)', 'Anatomy and Physiology', 'Astronomy (cosmology)'],
+        'Early Finance': [
+            'Advanced Budgeting Techniques & Financial Software', 'Understanding Mortgages and Rent (Real Estate as Asset/Liability)',
+            'Types of Credit (Credit Cards, Lines of Credit, Business Loans)', 'Investment Strategies (Growth vs. Income)',
+            'Taxation Principles (Income Tax, Property Tax)', 'Building Multiple Streams of Income'
+        ]
+    },
+    'Grade 12': {
+        'English': ['British Literature', 'College Essay Writing', 'Literary Criticism (independent)', 'Advanced Research', 'Debate and Persuasion'],
+        'Math': ['Calculus (limits, derivatives, integrals)', 'Advanced Statistics', 'Discrete Math'],
+        'Science': ['AP Biology/Chemistry/Physics (advanced topics)', 'Environmental Systems', 'Forensic Science', 'Biotechnology'],
+        'Early Finance': [
+            'Post-Secondary Education Financing & Student Loan Management', 'Advanced Tax Concepts (Deductions, Credits)',
+            'Retirement Accounts (401k, IRA, Roth IRA)', 'Entrepreneurship and Small Business Finance (Business Plans, Funding)',
+            'Estate Planning Basics', 'Understanding the Stock Market and Investing Principles', 'Financial Independence Concepts'
+        ]
+    }
+};
+
+// Main App component
+function App() {
+    // State variables for user inputs and generated content
+    const [grade, setGrade] = useState('Kindergarten'); // Default grade
+    const [subjects, setSubjects] = useState([]); // Selected subjects
+    const [selectedTopics, setSelectedTopics] = useState([]); // Newly added: selected specific topics
+    const [customInstructions, setCustomInstructions] = useState(''); // Custom instructions input
+    const [worksheet, setWorksheet] = useState(''); // Generated worksheet text
+    const [generatedImages, setGeneratedImages] = useState([]); // Generated image URLs
+    const [isLoadingWorksheet, setIsLoadingWorksheet] = useState(false); // Loading state for worksheet API call (text + images)
+    const [errorWorksheet, setErrorWorksheet] = useState(''); // Error message state for worksheet
+
+    const [answerKey, setAnswerKey] = useState(''); // Generated answer key
+    const [isLoadingAnswerKey, setIsLoadingAnswerKey] = useState(false); // Loading state for answer key API call
+    const [errorAnswerKey, setErrorAnswerKey] = useState(''); // Error message state for answer key
+
+    const [conceptToExplain, setConceptToExplain] = useState(''); // Concept input for explanation
+    const [conceptExplanation, setConceptExplanation] = useState(''); // Generated concept explanation
+    const [isLoadingConcept, setIsLoadingConcept] = useState(false); // Loading state for concept API call
+    const [errorConcept, setErrorConcept] = useState(''); // Error message state for concept
+
+    // Function to handle subject checkbox changes
+    const handleSubjectChange = (e) => {
+        const { value, checked } = e.target;
+        if (checked) {
+            setSubjects((prevSubjects) => [...prevSubjects, value]);
+        } else {
+            setSubjects((prevSubjects) => prevSubjects.filter((subject) => subject !== value));
+            // When a subject is unchecked, also remove its topics from selectedTopics
+            setSelectedTopics((prevTopics) => prevTopics.filter(topic => {
+                // Check if the topic belongs to the unchecked subject for the current grade
+                const topicsForSubject = gradeTopics[grade][value] || [];
+                return !topicsForSubject.includes(topic);
+            }));
+        }
+    };
+
+    // Function to handle topic checkbox changes
+    const handleTopicChange = (e) => {
+        const { value, checked } = e.target;
+        if (checked) {
+            setSelectedTopics((prevTopics) => [...prevTopics, value]);
+        } else {
+            setSelectedTopics((prevTopics) => prevTopics.filter((topic) => topic !== value));
+        }
+    };
+
+    // Function to call the Gemini API for text generation
+    const callGeminiAPI = async (prompt) => {
+        let chatHistory = [];
+        chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+        const payload = { contents: chatHistory };
+        const apiKey = ""; // API key is handled by the Canvas environment
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`API error: ${errorData.error.message || response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (result.candidates && result.candidates.length > 0 &&
+            result.candidates[0].content && result.candidates[0].content.parts &&
+            result.candidates[0].content.parts.length > 0) {
+            return result.candidates[0].content.parts[0].text;
+        } else {
+            throw new Error('No content generated by the model.');
+        }
+    };
+
+    // Function to generate an image using the Imagen API
+    const generateImage = async (imagePrompt) => {
+        const payload = { instances: { prompt: imagePrompt }, parameters: { "sampleCount": 1 } };
+        const apiKey = ""; // API key is handled by the Canvas environment
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Image API error: ${errorData.error.message || response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+            return `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+        } else {
+            throw new Error('No image generated by the model.');
+        }
+    };
+
+    // Function to generate the worksheet and associated images
+    const generateWorksheet = async () => {
+        setErrorWorksheet(''); // Clear previous errors
+        setWorksheet(''); // Clear previous worksheet text
+        setAnswerKey(''); // Clear previous answer key
+        setGeneratedImages([]); // Clear previous images
+        setIsLoadingWorksheet(true); // Set loading state to true
+
+        // Combine selected topics and custom instructions for the prompt
+        let topicsAndInstructions = [];
+        if (selectedTopics.length > 0) {
+            topicsAndInstructions.push(`Specific topics: ${selectedTopics.join(', ')}`);
+        }
+        if (customInstructions.trim() !== '') {
+            topicsAndInstructions.push(`Additional instructions: ${customInstructions.trim()}`);
+        }
+
+        let promptDetails = topicsAndInstructions.length > 0 ? ` Focusing on: ${topicsAndInstructions.join('; ')}.` : '';
+
+        // Construct the prompt for the LLM to generate worksheet text
+        let worksheetPrompt = `Generate a detailed and engaging worksheet for a ${grade} student focusing on the following subjects: ${subjects.join(', ')}.${promptDetails}`;
+        worksheetPrompt += ` The worksheet should be suitable for a kickstart to the school year, include a variety of question types (e.g., fill-in-the-blanks, multiple choice, short answer, problem-solving). For matching questions, present them clearly in two columns (e.g., Column A and Column B) with clear instructions. Provide clear instructions for the student.`; // Added matching question formatting instruction
+
+        try {
+            // 1. Generate worksheet text
+            const worksheetText = await callGeminiAPI(worksheetPrompt);
+            setWorksheet(worksheetText);
+
+            // 2. Generate images based on subjects and selected topics/custom instructions
+            let imagePrompts = [];
+            let primaryImageSubject = subjects.length > 0 ? subjects[0] : '';
+            let primaryImageTopic = selectedTopics.length > 0 ? selectedTopics[0] : '';
+
+            if (primaryImageTopic) {
+                imagePrompts.push(`Educational worksheet illustration for ${grade} about "${primaryImageTopic}". Style: child-friendly, cartoon, simple, clear.`);
+            } else if (primaryImageSubject) {
+                imagePrompts.push(`Educational worksheet illustration for ${grade} about ${primaryImageSubject}. Style: child-friendly, cartoon, simple, clear.`);
+            }
+
+            // Add a second image prompt if there's enough distinct information
+            if (selectedTopics.length > 1) {
+                imagePrompts.push(`Educational worksheet illustration for ${grade} about "${selectedTopics[1]}". Style: child-friendly, cartoon, simple, clear.`);
+            } else if (subjects.length > 1) {
+                imagePrompts.push(`Educational worksheet illustration for ${grade} about ${subjects[1]}. Style: child-friendly, cartoon, simple, clear.`);
+            } else if (customInstructions.trim() !== '') {
+                imagePrompts.push(`Educational worksheet illustration for ${grade} related to: "${customInstructions.split(',')[0].trim()}". Style: child-friendly, cartoon, simple, clear.`);
+            }
+
+
+            const images = [];
+            // Limit to a maximum of 2 images for faster generation
+            for (let i = 0; i < Math.min(imagePrompts.length, 2); i++) {
+                try {
+                    const imageUrl = await generateImage(imagePrompts[i]);
+                    images.push(imageUrl);
+                } catch (imgErr) {
+                    console.error(`Error generating image for prompt "${imagePrompts[i]}":`, imgErr);
+                    // Continue even if one image fails, don't block the whole process
+                }
+            }
+            setGeneratedImages(images);
+
+        } catch (err) {
+            console.error("Error generating worksheet or images:", err);
+            setErrorWorksheet(`Failed to generate content: ${err.message}`);
+        } finally {
+            setIsLoadingWorksheet(false); // Reset loading state
+        }
+    };
+
+    // Function to generate the answer key using the Gemini API
+    const generateAnswerKey = async () => {
+        setErrorAnswerKey('');
+        setAnswerKey('');
+        setIsLoadingAnswerKey(true);
+
+        if (!worksheet) {
+            setErrorAnswerKey("Please generate a worksheet first.");
+            setIsLoadingAnswerKey(false);
+            return;
+        }
+
+        const prompt = `Generate an answer key for the following worksheet. Provide clear answers for each question.
+        Worksheet:
+        ${worksheet}`;
+
+        try {
+            const text = await callGeminiAPI(prompt);
+            setAnswerKey(text);
+        } catch (err) {
+            console.error("Error generating answer key:", err);
+            setErrorAnswerKey(`Failed to generate answer key: ${err.message}`);
+        } finally {
+            setIsLoadingAnswerKey(false);
+        }
+    };
+
+    // Function to explain a concept using the Gemini API
+    const explainConcept = async () => {
+        setErrorConcept('');
+        setConceptExplanation('');
+        setIsLoadingConcept(true);
+
+        if (!conceptToExplain.trim()) {
+            setErrorConcept("Please enter a concept to explain.");
+            setIsLoadingConcept(false);
+            return;
+        }
+
+        const prompt = `Explain the concept "${conceptToExplain}" in simple terms suitable for a ${grade} student. Provide examples if possible.`;
+
+        try {
+            const text = await callGeminiAPI(prompt);
+            setConceptExplanation(text);
+        } catch (err) {
+            console.error("Error explaining concept:", err);
+            setErrorConcept(`Failed to explain concept: ${err.message}`);
+        } finally {
+            setIsLoadingConcept(false);
+        }
+    };
+
+    // Function to handle printing
+    const handlePrint = () => {
+        window.print();
+    };
+
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-green-100 to-teal-100 p-4 font-sans flex items-center justify-center">
+            <style>
+                {`
+                @media print {
+                    /* Hide elements not needed in print */
+                    .no-print {
+                        display: none !important;
+                    }
+                    /* Ensure content fits on page */
+                    body {
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .printable-area {
+                        width: 100%;
+                        margin: 0;
+                        padding: 1cm; /* Add some padding for print margins */
+                        box-shadow: none;
+                        border: none;
+                    }
+                    /* Adjust font sizes for readability if needed */
+                    .printable-area h2 {
+                        font-size: 1.5em;
+                    }
+                    .printable-area .prose {
+                        font-size: 1em;
+                    }
+                    /* Ensure images are scaled to fit */
+                    .printable-area img {
+                        max-width: 100%;
+                        height: auto;
+                        display: block;
+                        margin: 0.5cm auto;
+                    }
+                }
+                `}
+            </style>
+            <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl border border-gray-200 printable-area">
+                <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-8 no-print">
+                    Worksheet Generator
+                </h1>
+
+                {/* Grade Selection */}
+                <div className="mb-6 no-print">
+                    <label htmlFor="grade-select" className="block text-lg font-semibold text-gray-700 mb-2">
+                        Select Grade Level:
+                    </label>
+                    <select
+                        id="grade-select"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-200 ease-in-out shadow-sm"
+                        value={grade}
+                        onChange={(e) => {
+                            setGrade(e.target.value);
+                            // Clear selected topics when grade changes
+                            setSelectedTopics([]);
+                        }}
+                    >
+                        {['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5',
+                         'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'].map(g => (
+                            <option key={g} value={g}>{g}</option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Subject Selection */}
+                <div className="mb-6 no-print">
+                    <label className="block text-lg font-semibold text-gray-700 mb-2">
+                        Select Subjects:
+                    </label>
+                    <div className="flex flex-wrap gap-4">
+                        {['English', 'Math', 'Science', 'Early Finance'].map((subject) => (
+                            <label key={subject} className="flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    value={subject}
+                                    checked={subjects.includes(subject)}
+                                    onChange={handleSubjectChange}
+                                    className="form-checkbox h-5 w-5 text-green-600 rounded-md focus:ring-green-500 transition duration-150 ease-in-out"
+                                />
+                                <span className="ml-2 text-gray-800 text-base">{subject}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Topic Selection based on selected subjects and grade */}
+                {subjects.length > 0 && (
+                    <div className="mb-6 no-print">
+                        <label className="block text-lg font-semibold text-gray-700 mb-2">
+                            Select Topics (Optional):
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {subjects.map(subject => (
+                                <div key={subject} className="p-3 border border-gray-200 rounded-lg bg-gray-50">
+                                    <h4 className="font-semibold text-gray-700 mb-2">{subject} Topics:</h4>
+                                    <div className="flex flex-col gap-2">
+                                        {(gradeTopics[grade] && gradeTopics[grade][subject] || []).map(topic => (
+                                            <label key={topic} className="flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    value={topic}
+                                                    checked={selectedTopics.includes(topic)}
+                                                    onChange={handleTopicChange}
+                                                    className="form-checkbox h-4 w-4 text-blue-600 rounded-md focus:ring-blue-500 transition duration-150 ease-in-out"
+                                                />
+                                                <span className="ml-2 text-gray-700 text-sm">{topic}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+
+                {/* Custom Instructions Input */}
+                <div className="mb-8 no-print">
+                    <label htmlFor="custom-instructions" className="block text-lg font-semibold text-gray-700 mb-2">
+                        Additional Specific Requests (Optional):
+                    </label>
+                    <textarea
+                        id="custom-instructions"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-200 ease-in-out shadow-sm resize-y min-h-[80px]"
+                        placeholder="e.g., 'Make it a quiz format', 'Include a word search for English'"
+                        value={customInstructions}
+                        onChange={(e) => setCustomInstructions(e.target.value)}
+                    ></textarea>
+                </div>
+
+                {/* Generate Worksheet Button */}
+                <button
+                    onClick={generateWorksheet}
+                    disabled={isLoadingWorksheet || subjects.length === 0}
+                    className={`w-full py-3 px-6 rounded-lg text-white font-bold text-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg no-print
+                        ${isLoadingWorksheet || subjects.length === 0
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-green-600 hover:bg-green-700 active:bg-green-800'
+                        }`}
+                >
+                    {isLoadingWorksheet ? 'Generating Worksheet & Images...' : 'Generate Worksheet'}
+                </button>
+
+                {/* Error Display for Worksheet */}
+                {errorWorksheet && (
+                    <div className="mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg no-print">
+                        <p className="font-medium">Error:</p>
+                        <p>{errorWorksheet}</p>
+                    </div>
+                )}
+
+                {/* Generated Worksheet Display */}
+                {worksheet && (
+                    <div className="mt-8 p-6 bg-gray-50 border border-gray-200 rounded-xl shadow-inner">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Customized Worksheet:</h2>
+                        {isLoadingWorksheet && generatedImages.length === 0 && ( // Show image loading if no images yet
+                            <div className="text-center text-gray-600 mb-4 no-print">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-2"></div>
+                                Generating images...
+                            </div>
+                        )}
+                        {generatedImages.length > 0 && (
+                            <div className="flex flex-wrap justify-center gap-4 mb-6">
+                                {generatedImages.map((imgUrl, index) => (
+                                    <img key={index} src={imgUrl} alt={`Worksheet illustration ${index + 1}`} className="max-w-xs rounded-lg shadow-md border border-gray-200" />
+                                ))}
+                            </div>
+                        )}
+                        <div className="prose max-w-none text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: worksheet.replace(/\n/g, '<br />') }}></div>
+
+                        {/* Generate Answer Key Button */}
+                        <button
+                            onClick={generateAnswerKey}
+                            disabled={isLoadingAnswerKey}
+                            className={`mt-6 w-full py-2 px-4 rounded-lg text-white font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-md no-print
+                                ${isLoadingAnswerKey
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-purple-600 hover:bg-purple-700 active:bg-purple-800'
+                                }`}
+                        >
+                            {isLoadingAnswerKey ? 'Generating Answer Key...' : '✨ Generate Answer Key'}
+                        </button>
+
+                        {/* Print Worksheet Button */}
+                        <button
+                            onClick={handlePrint}
+                            className="mt-4 w-full py-2 px-4 rounded-lg text-white font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-md bg-blue-600 hover:bg-blue-700 active:bg-blue-800 no-print"
+                        >
+                            🖨️ Print Worksheet
+                        </button>
+
+                        {/* Error Display for Answer Key */}
+                        {errorAnswerKey && (
+                            <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg no-print">
+                                <p className="font-medium">Error:</p>
+                                <p>{errorAnswerKey}</p>
+                            </div>
+                        )}
+
+                        {/* Generated Answer Key Display - HIDDEN IN PRINT */}
+                        {answerKey && (
+                            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-inner no-print"> {/* Added no-print class */}
+                                <h3 className="text-xl font-bold text-gray-800 mb-2">Answer Key:</h3>
+                                <div className="prose max-w-none text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: answerKey.replace(/\n/g, '<br />') }}></div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Concept Explanation Section */}
+                <div className="mt-10 pt-6 border-t border-gray-200 no-print">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Explain a Concept</h2>
+                    <div className="mb-4">
+                        <label htmlFor="concept-input" className="block text-lg font-semibold text-gray-700 mb-2">
+                            Enter a concept to explain:
+                        </label>
+                        <input
+                            type="text"
+                            id="concept-input"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm"
+                            placeholder="e.g., 'Photosynthesis', 'Fractions', 'Verbs'"
+                            value={conceptToExplain}
+                            onChange={(e) => setConceptToExplain(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        onClick={explainConcept}
+                        disabled={isLoadingConcept || !conceptToExplain.trim()}
+                        className={`w-full py-3 px-6 rounded-lg text-white font-bold text-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg
+                            ${isLoadingConcept || !conceptToExplain.trim()
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                            }`}
+                    >
+                        {isLoadingConcept ? 'Explaining...' : '✨ Explain Concept'}
+                    </button>
+
+                    {/* Error Display for Concept Explanation */}
+                    {errorConcept && (
+                        <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                            <p className="font-medium">Error:</p>
+                            <p>{errorConcept}</p>
+                        </div>
+                    )}
+
+                    {/* Generated Concept Explanation Display */}
+                    {conceptExplanation && (
+                        <div className="mt-6 p-6 bg-yellow-50 border border-yellow-200 rounded-xl shadow-inner">
+                            <h3 className="text-xl font-bold text-gray-800 mb-2">Concept Explanation:</h3>
+                            <div className="prose max-w-none text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: conceptExplanation.replace(/\n/g, '<br />') }}></div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default App;
